@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../handler/game_handler.dart';
 import '../widget/game_mode_item.dart';
 
 class GameModeScreen extends StatelessWidget {
@@ -12,8 +13,9 @@ class GameModeScreen extends StatelessWidget {
       ),
       body: GridView(
         children: [
-          GameModeItem('1', 'Random Number', Colors.cyan),
-          GameModeItem('2', 'Specify Number', Colors.orange),
+          GameModeItem(GameHandler.RANDOM_KEY_ID, 'Random Number', Colors.cyan),
+          GameModeItem(
+              GameHandler.SPECIFIC_KEY_ID, 'Specify Number', Colors.orange),
         ],
         padding: const EdgeInsets.all(25),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

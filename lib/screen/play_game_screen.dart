@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
 
 class PlayGame extends StatefulWidget {
@@ -12,6 +13,9 @@ class PlayGame extends StatefulWidget {
 class _PlayGameState extends State<PlayGame> {
   final _form = GlobalKey<FormState>();
   final _guessNumberController = TextEditingController();
+  String fixValue = "";
+  bool isFirst = true;
+  GameHandler gameHandler = GameHandler();
 
   List<Map<String, String>> _result = [];
 
@@ -24,7 +28,7 @@ class _PlayGameState extends State<PlayGame> {
   }
 
   void _onSubmit(String value) {
-    print(value);
+    //print(value);
     if (_form.currentState!.validate()) {
       _calculateResult(value);
     }
@@ -32,7 +36,7 @@ class _PlayGameState extends State<PlayGame> {
   }
 
   void _calculateResult(String value) {
-    String fixValue = '1234';
+    //print('fixValue > ' + fixValue);
     int a = 0;
     int b = 0;
 
@@ -49,9 +53,9 @@ class _PlayGameState extends State<PlayGame> {
         }
       }
     }
-    _result.add({'result': '$a' + 'A' + '$b' + 'B', 'number': value});
+
     setState(() {
-      _result;
+      _result.add({'result': '$a' + 'A' + '$b' + 'B', 'number': value});
     });
 
     if (a == 4) {
@@ -86,6 +90,10 @@ class _PlayGameState extends State<PlayGame> {
               setState(() {
                 _result = [];
                 isWin = false;
+                String tempFixedValue = fixValue;
+                while (fixValue == tempFixedValue) {
+                  fixValue = gameHandler.randomNumber(GameHandler.LENGTH);
+                }
               });
               Navigator.of(context).pop();
             },
@@ -95,46 +103,24 @@ class _PlayGameState extends State<PlayGame> {
     );
   }
 
-  String? _validateGuessNumber(String value) {
-    if (value.isEmpty) {
-      return "Please provide a value.";
-    }
-    if (!isInteger(value)) {
-      return "Please enter an integer.";
-    }
-    if (value.length != 4) {
-      return "Please enter 4 digit.";
-    }
-    if (isHasDuplicate(value)) {
-      return "Please enter no duplicate digit.";
-    }
-    return null;
-  }
-
-  bool isHasDuplicate(String value) {
-    for (int i = 0; i < value.length - 1; i++) {
-      for (int j = i + 1; j < value.length; j++) {
-        if (value.characters.characterAt(i) ==
-            value.characters.characterAt(j)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  bool isInteger(String value) {
-    if (value == null) {
-      return false;
-    }
-    return int.tryParse(value) != null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final routeArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-    //print(routeArgs['id']);
+    //print('fixValueTemp > ' + (routeArgs['fixValue'] as String));
+    if (isFirst) {
+      String id = routeArgs['id'] as String;
+      if (id == GameHandler.SPECIFIC_KEY_ID) {
+        String fixValueTemp = routeArgs['fixValue'] as String;
+        if (fixValueTemp != null || fixValueTemp != '') {
+          fixValue = fixValueTemp;
+        }
+      } else {
+        fixValue = gameHandler.randomNumber(GameHandler.LENGTH);
+      }
+      isFirst = false;
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Let\'s Fun'),
@@ -152,7 +138,7 @@ class _PlayGameState extends State<PlayGame> {
                   onFieldSubmitted: (value) => _onSubmit(value),
                   controller: _guessNumberController,
                   validator: (value) {
-                    return _validateGuessNumber(value!);
+                    return gameHandler.validateGuessNumber(value!);
                   },
                 ),
               ),
