@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../handler/timer_controller.dart';
-import '../widget/timer_count_down.dart';
+import '../widget/timer_stop_watch.dart';
 import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
 
@@ -13,7 +13,7 @@ class PlayGame extends StatefulWidget {
 }
 
 class _PlayGameState extends State<PlayGame> {
-  final CountdownController _controller =
+  final CountdownController _timerController =
       new CountdownController(autoStart: true);
   final _form = GlobalKey<FormState>();
   final _guessNumberController = TextEditingController();
@@ -29,8 +29,14 @@ class _PlayGameState extends State<PlayGame> {
     int timeInt = time.truncate();
     int minutes = (timeInt / 60).truncate();
     int seconds = timeInt % 60;
+    String result = "";
+    if (minutes == 0) {
+      result = "$seconds";
+    } else {
+      result = "$minutes : $seconds";
+    }
 
-    return "$minutes : $seconds";
+    return result;
   }
 
   @override
@@ -48,7 +54,7 @@ class _PlayGameState extends State<PlayGame> {
   }
 
   void _calculateResult(String value) {
-    //print('fixValue > ' + fixValue);
+    print('fixValue > ' + fixValue);
     int a = 0;
     int b = 0;
 
@@ -76,6 +82,7 @@ class _PlayGameState extends State<PlayGame> {
   }
 
   Future<void> _congratDialog() async {
+    _timerController.pause();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -108,6 +115,7 @@ class _PlayGameState extends State<PlayGame> {
                 }
               });
               Navigator.of(context).pop();
+              _timerController.restart();
             },
           ),
         ],
@@ -142,26 +150,41 @@ class _PlayGameState extends State<PlayGame> {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.cyan,
-              ),
+              width: 70,
+              margin: EdgeInsets.fromLTRB(0, 15, 15, 0),
               padding: EdgeInsets.all(10),
-              margin: EdgeInsets.fromLTRB(0, 10, 10, 0),
-              child: Countdown(
-                controller: _controller,
-                seconds: 1,
-                build: (_, double time) => Text(
-                  calculateTimeToShow(time),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.cyan.withOpacity(0.4),
+                    Colors.cyan,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                interval: Duration(milliseconds: 100),
-                onFinished: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Timer is done!'),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  StopWatch(
+                    controller: _timerController,
+                    seconds: 0,
+                    build: (_, double time) => Text(
+                      calculateTimeToShow(time),
                     ),
-                  );
-                },
-                isTimeBackward: false,
+                    interval: Duration(milliseconds: 100),
+                    // onFinished: () {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text('Timer is done!'),
+                    //     ),
+                    //   );
+                    // },
+                  )
+                ],
               ),
             ),
           ),

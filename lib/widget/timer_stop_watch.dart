@@ -5,7 +5,7 @@ import '../handler/timer_controller.dart';
 ///
 /// Simple countdown timer.
 ///
-class Countdown extends StatefulWidget {
+class StopWatch extends StatefulWidget {
   /// Length of the timer
   final int seconds;
 
@@ -24,7 +24,7 @@ class Countdown extends StatefulWidget {
   ///
   /// Simple countdown timer
   ///
-  Countdown({
+  StopWatch({
     Key? key,
     required this.seconds,
     required this.build,
@@ -34,13 +34,13 @@ class Countdown extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CountdownState createState() => _CountdownState();
+  _StopWatchState createState() => _StopWatchState();
 }
 
 ///
 /// State of timer
 ///
-class _CountdownState extends State<Countdown> {
+class _StopWatchState extends State<StopWatch> {
   // Multiplier of secconds
   final int _secondsFactor = 1000000;
 
@@ -123,26 +123,11 @@ class _CountdownState extends State<Countdown> {
       widget.controller?.isCompleted = true;
     }
 
-    if (_currentMicroSeconds != 0) {
-      _timer = Timer.periodic(
-        widget.interval,
-        (Timer timer) {
-          if (_currentMicroSeconds <= 0) {
-            timer.cancel();
-
-            if (widget.onFinished != null) {
-              widget.onFinished!();
-            }
-
-            widget.controller?.isCompleted = true;
-          } else {
-            setState(() {
-              _currentMicroSeconds =
-                  _currentMicroSeconds - widget.interval.inMicroseconds;
-            });
-          }
-        },
-      );
-    }
+    _timer = Timer.periodic(widget.interval, (Timer timer) {
+      setState(() {
+        _currentMicroSeconds =
+            _currentMicroSeconds + widget.interval.inMicroseconds;
+      });
+    });
   }
 }
