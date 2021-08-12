@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../handler/timer_controller.dart';
+import '../widget/timer_count_down.dart';
 import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
 
@@ -11,6 +13,8 @@ class PlayGame extends StatefulWidget {
 }
 
 class _PlayGameState extends State<PlayGame> {
+  final CountdownController _controller =
+      new CountdownController(autoStart: true);
   final _form = GlobalKey<FormState>();
   final _guessNumberController = TextEditingController();
   String fixValue = "";
@@ -20,6 +24,14 @@ class _PlayGameState extends State<PlayGame> {
   List<Map<String, String>> _result = [];
 
   bool isWin = false;
+
+  String calculateTimeToShow(double time) {
+    int timeInt = time.truncate();
+    int minutes = (timeInt / 60).truncate();
+    int seconds = timeInt % 60;
+
+    return "$minutes : $seconds";
+  }
 
   @override
   void dispose() {
@@ -122,43 +134,70 @@ class _PlayGameState extends State<PlayGame> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Let\'s Fun'),
-        ),
-        body: SingleChildScrollView(
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _form,
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'guess'),
-                  //textInputAction: TextInputAction.go,
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: (value) => _onSubmit(value),
-                  controller: _guessNumberController,
-                  validator: (value) {
-                    return gameHandler.validateGuessNumber(value!);
-                  },
+      appBar: AppBar(
+        title: Text('Let\'s Fun'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.cyan,
+              ),
+              padding: EdgeInsets.all(10),
+              margin: EdgeInsets.fromLTRB(0, 10, 10, 0),
+              child: Countdown(
+                controller: _controller,
+                seconds: 1,
+                build: (_, double time) => Text(
+                  calculateTimeToShow(time),
                 ),
+                interval: Duration(milliseconds: 100),
+                onFinished: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Timer is done!'),
+                    ),
+                  );
+                },
+                isTimeBackward: false,
               ),
             ),
-            Container(
-              height: 500,
-              width: 200,
-              child: ListView.builder(
-                itemBuilder: (ctx, index) => ListTile(
-                  leading: CircleAvatar(
-                    child: Text('# ${(index + 1)}'),
-                  ),
-                  title: Text((_result[index]['number'] as String) +
-                      ' : ' +
-                      (_result[index]['result'] as String)),
-                ),
-                itemCount: _result.length,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _form,
+              child: TextFormField(
+                decoration: InputDecoration(labelText: 'guess'),
+                //textInputAction: TextInputAction.go,
+                keyboardType: TextInputType.number,
+                onFieldSubmitted: (value) => _onSubmit(value),
+                controller: _guessNumberController,
+                validator: (value) {
+                  return gameHandler.validateGuessNumber(value!);
+                },
               ),
             ),
-          ]),
-        ));
+          ),
+          Container(
+            height: 500,
+            width: 200,
+            child: ListView.builder(
+              itemBuilder: (ctx, index) => ListTile(
+                leading: CircleAvatar(
+                  child: Text('# ${(index + 1)}'),
+                ),
+                title: Text((_result[index]['number'] as String) +
+                    ' : ' +
+                    (_result[index]['result'] as String)),
+              ),
+              itemCount: _result.length,
+            ),
+          ),
+        ]),
+      ),
+    );
   }
 }
