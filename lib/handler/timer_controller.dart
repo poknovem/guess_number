@@ -33,6 +33,9 @@ class CountdownController {
   /// if timer auto start.
   final bool autoStart;
 
+  /// time holders
+  double? _time;
+
   ///
   /// Constructor
   ///
@@ -93,4 +96,10 @@ class CountdownController {
   setOnRestart(VoidCallback onRestart) {
     this.onRestart = onRestart;
   }
+
+  /// time getter
+  double? get time => _time;
+
+  /// time setter
+  set time(double? time) => this._time = time;
 }

@@ -78,9 +78,11 @@ class _StopWatchState extends State<StopWatch> {
 
   @override
   Widget build(BuildContext context) {
+    double time = _currentMicroSeconds / _secondsFactor;
+    widget.controller?.time = time;
     return widget.build(
       context,
-      _currentMicroSeconds / _secondsFactor,
+      time,
     );
   }
 
