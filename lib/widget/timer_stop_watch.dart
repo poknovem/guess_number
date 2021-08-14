@@ -52,7 +52,12 @@ class _StopWatchState extends State<StopWatch> {
 
   @override
   void initState() {
-    _currentMicroSeconds = widget.seconds * _secondsFactor;
+    /// For no auto time restart when parent node rebuit
+    if (widget.controller!.currentMicroSeconds != null) {
+      _currentMicroSeconds = widget.controller!.currentMicroSeconds!;
+    } else {
+      _currentMicroSeconds = widget.seconds * _secondsFactor;
+    }
 
     widget.controller?.setOnStart(_startTimer);
     widget.controller?.setOnPause(_onTimerPaused);
@@ -80,6 +85,7 @@ class _StopWatchState extends State<StopWatch> {
   Widget build(BuildContext context) {
     double time = _currentMicroSeconds / _secondsFactor;
     widget.controller?.time = time;
+    widget.controller?.currentMicroSeconds = _currentMicroSeconds;
     return widget.build(
       context,
       time,

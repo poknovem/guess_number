@@ -31,10 +31,13 @@ class CountdownController {
   bool? isCompleted;
 
   /// if timer auto start.
-  final bool autoStart;
+  bool autoStart;
 
-  /// time holders
+  /// time holders ( _currentMicroSeconds / _secondsFactor )
   double? _time;
+
+  /// time holders ( _currentMicroSeconds )
+  int? _currentMicroSeconds;
 
   ///
   /// Constructor
@@ -102,4 +105,11 @@ class CountdownController {
 
   /// time setter
   set time(double? time) => this._time = time;
+
+  /// _currentMicroSeconds getter
+  int? get currentMicroSeconds => _currentMicroSeconds;
+
+  /// _currentMicroSeconds setter
+  set currentMicroSeconds(int? currentMicroSeconds) =>
+      this._currentMicroSeconds = currentMicroSeconds;
 }

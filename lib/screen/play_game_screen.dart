@@ -213,6 +213,8 @@ class _PlayGameState extends State<PlayGame> {
   Future<void> _congratDialogV2() async {
     _timerController.pause();
 
+    _timerController.autoStart = false;
+
     setState(() {
       _isSavingScore = true;
     });
