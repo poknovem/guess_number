@@ -4,6 +4,9 @@ import '../handler/timer_controller.dart';
 import '../widget/timer_stop_watch.dart';
 import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'dart:convert';
 
 class PlayGame extends StatefulWidget {
   static const String ROUTE_NAME = "/play_game";
@@ -20,6 +23,7 @@ class _PlayGameState extends State<PlayGame> {
   String fixValue = "";
   bool isFirst = true;
   GameHandler gameHandler = GameHandler();
+  bool _isSavingScore = false;
 
   List<Map<String, String>> _result = [];
 
@@ -77,12 +81,148 @@ class _PlayGameState extends State<PlayGame> {
     });
 
     if (a == 4) {
-      _congratDialog();
+      //_congratDialog();
+      _congratDialogV2();
     }
+  }
+
+  Future<Response> _saveScore() {
+    final url = Uri.parse(GameHandler.SCORED_URL);
+    return http.post(
+      url,
+      body: json.encode({
+        'date': DateTime.now().toString(),
+        'time_usage': _timerController.time.toString(),
+      }),
+    );
+  }
+
+  /**
+   * For async/await example
+   * async => all the code you have in there automatically gets wrapped in to a Future, so don't have to "return" keyword anymore.
+   *          And that Future will also be returned automatically (behind the scenes).
+   */
+  Future<void> _saveScoreV2() async {
+    final url = Uri.parse(GameHandler.SCORED_URL);
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'date': DateTime.now().toString(),
+          'time_usage': _timerController.time.toString(),
+        }),
+      );
+
+      //TODO
+
+    } on Exception catch (e) {
+      saveScoreExceptionHandler(e);
+    }
+  }
+
+  /**
+   * For async/await example
+   * async => also can have "return" keyword like this.
+   * the valuation of _saveScoreV3() equals _saveScore()
+   */
+  Future<Response> _saveScoreV3() async {
+    final url = Uri.parse(GameHandler.SCORED_URL);
+    final http.Response response = await http.post(
+      url,
+      body: json.encode({
+        'date': DateTime.now().toString(),
+        'time_usage': _timerController.time.toString(),
+      }),
+    );
+
+    return response;
+  }
+
+  void saveScoreExceptionHandler(var error) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Something went wrong!!"),
+        content: Text(error.toString()),
+        elevation: 24.0,
+        backgroundColor: Theme.of(context).canvasColor,
+        actions: [
+          FlatButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  GameModeScreen.ROUTE_NAME, (route) => false);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _congratDialog() async {
     _timerController.pause();
+    Future<Response> saveScoreCallback = _saveScore();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Congratulation!!"),
+        content: const Text("Do you want to play again?"),
+        elevation: 24.0,
+        backgroundColor: Theme.of(context).canvasColor,
+        actions: [
+          FlatButton(
+            child: const Text('No'),
+            onPressed: () {
+              // setState(() {
+              //   _result = [];
+              //   isWin = false;
+              // });
+
+              saveScoreCallback.then((_) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    GameModeScreen.ROUTE_NAME, (route) => false);
+              }).catchError((error) {
+                saveScoreExceptionHandler(error);
+              });
+            },
+          ),
+          FlatButton(
+            child: const Text('Okay'),
+            onPressed: () {
+              saveScoreCallback.then((_) {
+                setState(() {
+                  _result = [];
+                  isWin = false;
+                  String tempFixedValue = fixValue;
+                  while (fixValue == tempFixedValue) {
+                    fixValue = gameHandler.randomNumber(GameHandler.LENGTH);
+                  }
+                });
+                Navigator.of(context).pop();
+                _timerController.restart();
+              }).catchError((error) {
+                saveScoreExceptionHandler(error);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _congratDialogV2() async {
+    _timerController.pause();
+
+    setState(() {
+      _isSavingScore = true;
+    });
+
+    await _saveScoreV2();
+
+    setState(() {
+      _isSavingScore = false;
+    });
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -145,82 +285,86 @@ class _PlayGameState extends State<PlayGame> {
       appBar: AppBar(
         title: Text('Let\'s Fun'),
       ),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              width: 70,
-              margin: EdgeInsets.fromLTRB(0, 15, 15, 0),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.cyan.withOpacity(0.4),
-                    Colors.cyan,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  StopWatch(
-                    controller: _timerController,
-                    seconds: 0,
-                    build: (_, double time) => Text(
-                      calculateTimeToShow(time),
+      body: _isSavingScore
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Column(children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    width: 70,
+                    margin: EdgeInsets.fromLTRB(0, 15, 15, 0),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.cyan.withOpacity(0.4),
+                          Colors.cyan,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    interval: Duration(milliseconds: 100),
-                    // onFinished: () {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     SnackBar(
-                    //       content: Text('Timer is done!'),
-                    //     ),
-                    //   );
-                    // },
-                  )
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _form,
-              child: TextFormField(
-                decoration: InputDecoration(labelText: 'guess'),
-                //textInputAction: TextInputAction.go,
-                keyboardType: TextInputType.number,
-                onFieldSubmitted: (value) => _onSubmit(value),
-                controller: _guessNumberController,
-                validator: (value) {
-                  return gameHandler.validateGuessNumber(value!);
-                },
-              ),
-            ),
-          ),
-          Container(
-            height: 500,
-            width: 200,
-            child: ListView.builder(
-              itemBuilder: (ctx, index) => ListTile(
-                leading: CircleAvatar(
-                  child: Text('# ${(index + 1)}'),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        StopWatch(
+                          controller: _timerController,
+                          seconds: 0,
+                          build: (_, double time) => Text(
+                            calculateTimeToShow(time),
+                          ),
+                          interval: Duration(milliseconds: 100),
+                          // onFinished: () {
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //     SnackBar(
+                          //       content: Text('Timer is done!'),
+                          //     ),
+                          //   );
+                          // },
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-                title: Text((_result[index]['number'] as String) +
-                    ' : ' +
-                    (_result[index]['result'] as String)),
-              ),
-              itemCount: _result.length,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: _form,
+                    child: TextFormField(
+                      decoration: InputDecoration(labelText: 'guess'),
+                      //textInputAction: TextInputAction.go,
+                      keyboardType: TextInputType.number,
+                      onFieldSubmitted: (value) => _onSubmit(value),
+                      controller: _guessNumberController,
+                      validator: (value) {
+                        return gameHandler.validateGuessNumber(value!);
+                      },
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 500,
+                  width: 200,
+                  child: ListView.builder(
+                    itemBuilder: (ctx, index) => ListTile(
+                      leading: CircleAvatar(
+                        child: Text('# ${(index + 1)}'),
+                      ),
+                      title: Text((_result[index]['number'] as String) +
+                          ' : ' +
+                          (_result[index]['result'] as String)),
+                    ),
+                    itemCount: _result.length,
+                  ),
+                ),
+              ]),
             ),
-          ),
-        ]),
-      ),
     );
   }
 }

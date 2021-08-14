@@ -4,6 +4,11 @@ class GameHandler {
   static final int LENGTH = 4;
   static final String RANDOM_KEY_ID = '1';
   static final String SPECIFIC_KEY_ID = '2';
+  static final String FIREBASE_REALTIME_DATABASE_URL =
+      "https://guessnumber-90e65-default-rtdb.asia-southeast1.firebasedatabase.app/";
+  static final String SCORED_HTTP_VERB = "scored.json";
+  static final String SCORED_URL =
+      FIREBASE_REALTIME_DATABASE_URL + SCORED_HTTP_VERB;
 
   String randomNumber(int length) {
     List<int> numbers = [];
