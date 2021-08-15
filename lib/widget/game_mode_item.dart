@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../handler/game_handler.dart';
-import 'package:guess_number/screen/play_game_screen.dart';
+import '../screen/play_game_screen.dart';
 
 class GameModeItem extends StatelessWidget {
   final String id;

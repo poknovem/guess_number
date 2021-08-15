@@ -3,7 +3,7 @@ import '../handler/game_handler.dart';
 import '../widget/game_mode_item.dart';
 
 class GameModeScreen extends StatelessWidget {
-  static const String ROUTE_NAME = "/";
+  static const String ROUTE_NAME = "/game_mode";
 
   @override
   Widget build(BuildContext context) {

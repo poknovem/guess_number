@@ -5,7 +5,6 @@ import '../widget/timer_stop_watch.dart';
 import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'dart:convert';
 
 class PlayGame extends StatefulWidget {
@@ -86,7 +85,7 @@ class _PlayGameState extends State<PlayGame> {
     }
   }
 
-  Future<Response> _saveScore() {
+  Future<http.Response> _saveScore() {
     final url = Uri.parse(GameHandler.SCORED_URL);
     return http.post(
       url,
@@ -105,7 +104,7 @@ class _PlayGameState extends State<PlayGame> {
   Future<void> _saveScoreV2() async {
     final url = Uri.parse(GameHandler.SCORED_URL);
     try {
-      final response = await http.post(
+      final http.Response response = await http.post(
         url,
         body: json.encode({
           'date': DateTime.now().toString(),
@@ -116,7 +115,7 @@ class _PlayGameState extends State<PlayGame> {
       //TODO
 
     } on Exception catch (e) {
-      saveScoreExceptionHandler(e);
+      gameHandler.alertException(context, 'Something went wrong', e.toString());
     }
   }
 
@@ -125,7 +124,7 @@ class _PlayGameState extends State<PlayGame> {
    * async => also can have "return" keyword like this.
    * the valuation of _saveScoreV3() equals _saveScore()
    */
-  Future<Response> _saveScoreV3() async {
+  Future<http.Response> _saveScoreV3() async {
     final url = Uri.parse(GameHandler.SCORED_URL);
     final http.Response response = await http.post(
       url,
@@ -138,30 +137,9 @@ class _PlayGameState extends State<PlayGame> {
     return response;
   }
 
-  void saveScoreExceptionHandler(var error) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Something went wrong!!"),
-        content: Text(error.toString()),
-        elevation: 24.0,
-        backgroundColor: Theme.of(context).canvasColor,
-        actions: [
-          FlatButton(
-            child: const Text('Ok'),
-            onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  GameModeScreen.ROUTE_NAME, (route) => false);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _congratDialog() async {
     _timerController.pause();
-    Future<Response> saveScoreCallback = _saveScore();
+    Future<http.Response> saveScoreCallback = _saveScore();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -182,7 +160,8 @@ class _PlayGameState extends State<PlayGame> {
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     GameModeScreen.ROUTE_NAME, (route) => false);
               }).catchError((error) {
-                saveScoreExceptionHandler(error);
+                gameHandler.alertException(
+                    context, 'Something went wrong', error.toString());
               });
             },
           ),
@@ -201,7 +180,8 @@ class _PlayGameState extends State<PlayGame> {
                 Navigator.of(context).pop();
                 _timerController.restart();
               }).catchError((error) {
-                saveScoreExceptionHandler(error);
+                gameHandler.alertException(
+                    context, 'Something went wrong', error.toString());
               });
             },
           ),
