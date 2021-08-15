@@ -10,7 +10,20 @@ class Auth with ChangeNotifier {
   DateTime? _expiryDate;
   String? _userId;
 
-  Future<void> authenticate(
+  bool get isAuth {
+    return token != null;
+  }
+
+  String? get token {
+    if (_expiryDate != null &&
+        _expiryDate!.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
+  Future<void> _authenticate(
       String email, String password, String urlStr) async {
     final Uri url = Uri.parse(urlStr);
     try {
@@ -28,16 +41,24 @@ class Auth with ChangeNotifier {
         //print("==> " + body['error']['message']);
         throw HttpException(body['error']['message']);
       }
+      _token = body['idToken'];
+      _userId = body['localId'];
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(body['expiresIn']),
+        ),
+      );
+      notifyListeners();
     } on Exception catch (e) {
       throw e;
     }
   }
 
   Future<void> signUp(String email, String password) async {
-    return authenticate(email, password, GameHandler.SIGN_UP_URL);
+    return _authenticate(email, password, GameHandler.SIGN_UP_URL);
   }
 
   Future<void> logIn(String email, String password) async {
-    return authenticate(email, password, GameHandler.LOG_IN_URL);
+    return _authenticate(email, password, GameHandler.LOG_IN_URL);
   }
 }

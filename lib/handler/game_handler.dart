@@ -19,9 +19,8 @@ class GameHandler {
   /// scored http verb
   static final String SCORED_HTTP_VERB = "scored.json";
 
-  /// scored url
-  static final String SCORED_URL =
-      FIREBASE_REALTIME_DATABASE_URL + SCORED_HTTP_VERB;
+  /// auth token http verb
+  static final String SCORED_AUTH_VERB = "?auth=";
 
   /// firebase authentication url
   static final String FIREBASE_AUTHENTICATION_API_URL =
@@ -35,17 +34,21 @@ class GameHandler {
   static final String FIREBASE_WEB_API_KEY =
       "AIzaSyAbtl-Ry9LS7ZYDo5yBZ2ZxwHghrKGrExg";
 
-  ///sign up url
-  static final String SIGN_UP_URL =
-      FIREBASE_SIGN_UP_BY_EMAIL_API_URL + FIREBASE_WEB_API_KEY;
-
   /// firebase log in by email url
   static final String FIREBASE_LOG_IN_BY_EMAIL_API_URL =
       FIREBASE_AUTHENTICATION_API_URL + "signInWithPassword?key=";
 
+  ///sign up url
+  static final String SIGN_UP_URL =
+      FIREBASE_SIGN_UP_BY_EMAIL_API_URL + FIREBASE_WEB_API_KEY;
+
   /// sign up url
   static final String LOG_IN_URL =
       FIREBASE_LOG_IN_BY_EMAIL_API_URL + FIREBASE_WEB_API_KEY;
+
+  /// scored url
+  static final String SCORED_URL =
+      FIREBASE_REALTIME_DATABASE_URL + SCORED_HTTP_VERB + SCORED_AUTH_VERB;
 
   /// error message mapping
   static final Map<String, String> ERROR_MESSAGE_MAPPING = {

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../providers/score.dart';
 import '../handler/timer_controller.dart';
 import '../widget/timer_stop_watch.dart';
 import '../handler/game_handler.dart';
 import './game_mode_screen.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:provider/provider.dart';
 
 class PlayGame extends StatefulWidget {
   static const String ROUTE_NAME = "/play_game";
@@ -80,20 +80,8 @@ class _PlayGameState extends State<PlayGame> {
     });
 
     if (a == 4) {
-      //_congratDialog();
-      _congratDialogV2();
+      _congratDialog();
     }
-  }
-
-  Future<http.Response> _saveScore() {
-    final url = Uri.parse(GameHandler.SCORED_URL);
-    return http.post(
-      url,
-      body: json.encode({
-        'date': DateTime.now().toString(),
-        'time_usage': _timerController.time.toString(),
-      }),
-    );
   }
 
   /**
@@ -101,96 +89,13 @@ class _PlayGameState extends State<PlayGame> {
    * async => all the code you have in there automatically gets wrapped in to a Future, so don't have to "return" keyword anymore.
    *          And that Future will also be returned automatically (behind the scenes).
    */
-  Future<void> _saveScoreV2() async {
-    final url = Uri.parse(GameHandler.SCORED_URL);
-    try {
-      final http.Response response = await http.post(
-        url,
-        body: json.encode({
-          'date': DateTime.now().toString(),
-          'time_usage': _timerController.time.toString(),
-        }),
-      );
-
-      //TODO
-
-    } on Exception catch (e) {
-      gameHandler.alertException(context, 'Something went wrong', e.toString());
-    }
-  }
-
-  /**
-   * For async/await example
-   * async => also can have "return" keyword like this.
-   * the valuation of _saveScoreV3() equals _saveScore()
-   */
-  Future<http.Response> _saveScoreV3() async {
-    final url = Uri.parse(GameHandler.SCORED_URL);
-    final http.Response response = await http.post(
-      url,
-      body: json.encode({
-        'date': DateTime.now().toString(),
-        'time_usage': _timerController.time.toString(),
-      }),
+  Future<void> _saveScore() async {
+    await Provider.of<Score>(context, listen: false).save(
+      _timerController.time.toString(),
     );
-
-    return response;
   }
 
   Future<void> _congratDialog() async {
-    _timerController.pause();
-    Future<http.Response> saveScoreCallback = _saveScore();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Congratulation!!"),
-        content: const Text("Do you want to play again?"),
-        elevation: 24.0,
-        backgroundColor: Theme.of(context).canvasColor,
-        actions: [
-          FlatButton(
-            child: const Text('No'),
-            onPressed: () {
-              // setState(() {
-              //   _result = [];
-              //   isWin = false;
-              // });
-
-              saveScoreCallback.then((_) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    GameModeScreen.ROUTE_NAME, (route) => false);
-              }).catchError((error) {
-                gameHandler.alertException(
-                    context, 'Something went wrong', error.toString());
-              });
-            },
-          ),
-          FlatButton(
-            child: const Text('Okay'),
-            onPressed: () {
-              saveScoreCallback.then((_) {
-                setState(() {
-                  _result = [];
-                  isWin = false;
-                  String tempFixedValue = fixValue;
-                  while (fixValue == tempFixedValue) {
-                    fixValue = gameHandler.randomNumber(GameHandler.LENGTH);
-                  }
-                });
-                Navigator.of(context).pop();
-                _timerController.restart();
-              }).catchError((error) {
-                gameHandler.alertException(
-                    context, 'Something went wrong', error.toString());
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _congratDialogV2() async {
     _timerController.pause();
 
     _timerController.autoStart = false;
@@ -199,7 +104,7 @@ class _PlayGameState extends State<PlayGame> {
       _isSavingScore = true;
     });
 
-    await _saveScoreV2();
+    await _saveScore();
 
     setState(() {
       _isSavingScore = false;
