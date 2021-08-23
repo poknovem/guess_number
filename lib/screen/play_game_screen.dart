@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../providers/lang.dart';
 import '../providers/score.dart';
 import '../handler/timer_controller.dart';
 import '../widget/timer_stop_watch.dart';
@@ -48,15 +49,15 @@ class _PlayGameState extends State<PlayGame> {
     super.dispose();
   }
 
-  void _onSubmit(String value) {
+  void _onSubmit(String value, Lang lang) {
     //print(value);
     if (_form.currentState!.validate()) {
-      _calculateResult(value);
+      _calculateResult(value, lang);
     }
     _guessNumberController.clear();
   }
 
-  void _calculateResult(String value) {
+  void _calculateResult(String value, Lang lang) {
     print('fixValue > ' + fixValue);
     int a = 0;
     int b = 0;
@@ -80,7 +81,7 @@ class _PlayGameState extends State<PlayGame> {
     });
 
     if (a == 4) {
-      _congratDialog();
+      _congratDialog(lang);
     }
   }
 
@@ -95,7 +96,7 @@ class _PlayGameState extends State<PlayGame> {
     );
   }
 
-  Future<void> _congratDialog() async {
+  Future<void> _congratDialog(Lang lang) async {
     _timerController.pause();
 
     _timerController.autoStart = false;
@@ -113,13 +114,13 @@ class _PlayGameState extends State<PlayGame> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Congratulation!!"),
-        content: const Text("Do you want to play again?"),
+        title: Text(lang.language.congratulation),
+        content: Text(lang.language.doYouWantToPlayAgain),
         elevation: 24.0,
         backgroundColor: Theme.of(context).canvasColor,
         actions: [
           FlatButton(
-            child: const Text('No'),
+            child: Text(lang.language.no),
             onPressed: () {
               // setState(() {
               //   _result = [];
@@ -131,7 +132,7 @@ class _PlayGameState extends State<PlayGame> {
             },
           ),
           FlatButton(
-            child: const Text('Okay'),
+            child: Text(lang.language.okay),
             onPressed: () {
               setState(() {
                 _result = [];
@@ -152,6 +153,7 @@ class _PlayGameState extends State<PlayGame> {
 
   @override
   Widget build(BuildContext context) {
+    Lang lang = Provider.of<Lang>(context);
     final routeArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, String>;
     //print('fixValueTemp > ' + (routeArgs['fixValue'] as String));
@@ -170,7 +172,7 @@ class _PlayGameState extends State<PlayGame> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Let\'s Fun'),
+        title: Text(lang.language.letsFun),
       ),
       body: _isSavingScore
           ? Center(
@@ -224,13 +226,14 @@ class _PlayGameState extends State<PlayGame> {
                   child: Form(
                     key: _form,
                     child: TextFormField(
-                      decoration: InputDecoration(labelText: 'guess'),
+                      decoration:
+                          InputDecoration(labelText: lang.language.guess),
                       //textInputAction: TextInputAction.go,
                       keyboardType: TextInputType.number,
-                      onFieldSubmitted: (value) => _onSubmit(value),
+                      onFieldSubmitted: (value) => _onSubmit(value, lang),
                       controller: _guessNumberController,
                       validator: (value) {
-                        return gameHandler.validateGuessNumber(value!);
+                        return gameHandler.validateGuessNumber(value!, lang);
                       },
                     ),
                   ),

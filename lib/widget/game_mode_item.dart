@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../providers/lang.dart';
+import 'package:provider/provider.dart';
 import '../handler/game_handler.dart';
 import '../screen/play_game_screen.dart';
 
@@ -21,11 +23,11 @@ class GameModeItem extends StatelessWidget {
     }
   }
 
-  void _enterKeyDialog(BuildContext context) {
+  void _enterKeyDialog(BuildContext context, Lang lang) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text("Please enter the number!!"),
+        title: Text(lang.language.pleaseEnterTheNumber),
         content: SingleChildScrollView(
           child: Column(
             children: [
@@ -34,11 +36,11 @@ class GameModeItem extends StatelessWidget {
                 child: Form(
                   key: _form,
                   child: TextFormField(
-                    decoration: InputDecoration(labelText: 'key'),
+                    decoration: InputDecoration(labelText: lang.language.key),
                     keyboardType: TextInputType.number,
                     onFieldSubmitted: (value) => _onSubmit(value, context),
                     validator: (value) {
-                      return gameHandler.validateGuessNumber(value!);
+                      return gameHandler.validateGuessNumber(value!, lang);
                     },
                   ),
                 ),
@@ -53,9 +55,9 @@ class GameModeItem extends StatelessWidget {
     );
   }
 
-  void _selectItem(BuildContext context) {
+  void _selectItem(BuildContext context, Lang lang) {
     if (id == GameHandler.SPECIFIC_KEY_ID) {
-      _enterKeyDialog(context);
+      _enterKeyDialog(context, lang);
     } else {
       Navigator.of(context).pushNamed(
         PlayGame.ROUTE_NAME,
@@ -66,8 +68,9 @@ class GameModeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Lang lang = Provider.of<Lang>(context);
     return InkWell(
-      onTap: () => _selectItem(context),
+      onTap: () => _selectItem(context, lang),
       splashColor: Theme.of(context).primaryColor,
       borderRadius: BorderRadius.circular(15),
       child: Container(

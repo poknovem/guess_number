@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../providers/lang.dart';
 
 class GameHandler {
   /// number length
@@ -75,18 +76,18 @@ class GameHandler {
     return numbers.join();
   }
 
-  String? validateGuessNumber(String value) {
+  String? validateGuessNumber(String value, Lang lang) {
     if (value.isEmpty) {
-      return "Please provide a value.";
+      return lang.language.pleaseProvideAValue;
     }
     if (!isInteger(value)) {
-      return "Please enter an integer.";
+      return lang.language.pleaseEnterAnInteger;
     }
     if (value.length != GameHandler.LENGTH) {
-      return "Please enter ${GameHandler.LENGTH} digit.";
+      return lang.language.pleaseEnterXDigit(GameHandler.LENGTH);
     }
     if (isHasDuplicate(value)) {
-      return "Please enter no duplicate digit.";
+      return lang.language.pleaseEnterNoDuplicateDigit;
     }
     return null;
   }

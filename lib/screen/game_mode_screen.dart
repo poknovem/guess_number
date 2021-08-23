@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:guess_number/widget/app_drawer.dart';
+import '../providers/lang.dart';
+import '../widget/app_drawer.dart';
+import 'package:provider/provider.dart';
 import '../handler/game_handler.dart';
 import '../widget/game_mode_item.dart';
 
@@ -8,15 +10,17 @@ class GameModeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Lang lang = Provider.of<Lang>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Guess Number'),
+        title: Text(lang.language.appName),
       ),
       body: GridView(
         children: [
-          GameModeItem(GameHandler.RANDOM_KEY_ID, 'Random Number', Colors.cyan),
-          GameModeItem(
-              GameHandler.SPECIFIC_KEY_ID, 'Specify Number', Colors.orange),
+          GameModeItem(GameHandler.RANDOM_KEY_ID,
+              lang.language.randomNumberOptionName, Colors.cyan),
+          GameModeItem(GameHandler.SPECIFIC_KEY_ID,
+              lang.language.specificNumberOptionName, Colors.orange),
         ],
         padding: const EdgeInsets.all(25),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(

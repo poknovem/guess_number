@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../providers/lang.dart';
+import '../screen/settings_screen.dart';
 import '../providers/auth.dart';
 import '../providers/score.dart';
 import '../screen/auth_screen.dart';
@@ -16,8 +18,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(
-          value: Auth(),
+        //** ChangeNotifierProvider.value is suitable with reuse existing object*/
+        //ChangeNotifierProvider.value(
+        //value: Auth(),
+        ChangeNotifierProvider(
+          //** create is suitable with new instance of object*/
+          create: (BuildContext context) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          //** create is suitable with new instance of object*/
+          create: (BuildContext context) => Lang(),
         ),
         ChangeNotifierProxyProvider<Auth, Score>(
           create: (BuildContext context) => Score("initial token"),
@@ -62,6 +72,7 @@ class MyApp extends StatelessWidget {
             GameModeScreen.ROUTE_NAME: (ctx) => GameModeScreen(),
             PlayGame.ROUTE_NAME: (ctx) => PlayGame(),
             AuthScreen.ROUTE_NAME: (ctx) => AuthScreen(),
+            SettingsScreen.ROUTE_NAME: (ctx) => SettingsScreen(),
           },
         ),
       ),
