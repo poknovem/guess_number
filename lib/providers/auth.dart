@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
-  static final USERDATA_PREFS_KEY = "userData";
+  static final String USERDATA_PREFS_KEY = "userData";
   String? _token;
   DateTime? _expiryDate;
   String? _userId;

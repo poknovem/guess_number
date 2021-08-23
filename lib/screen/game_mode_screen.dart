@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:guess_number/widget/app_drawer.dart';
 import '../handler/game_handler.dart';
 import '../widget/game_mode_item.dart';
 
@@ -25,6 +26,7 @@ class GameModeScreen extends StatelessWidget {
           childAspectRatio: 3 / 2,
         ),
       ),
+      drawer: AppDrawer(),
     );
   }
 }
