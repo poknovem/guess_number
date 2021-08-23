@@ -47,7 +47,17 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
           ),
-          home: auth.isAuth ? GameModeScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? GameModeScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                    return snapshot.connectionState == ConnectionState.waiting
+                        ? CircularProgressIndicator()
+                        : AuthScreen();
+                  },
+                ),
           routes: {
             GameModeScreen.ROUTE_NAME: (ctx) => GameModeScreen(),
             PlayGame.ROUTE_NAME: (ctx) => PlayGame(),

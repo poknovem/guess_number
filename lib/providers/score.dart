@@ -17,7 +17,7 @@ class Score with ChangeNotifier {
       final http.Response response = await http.post(
         url,
         body: json.encode({
-          'date': DateTime.now().toString(),
+          'date': DateTime.now().toIso8601String(),
           'time_usage': time,
         }),
       );
