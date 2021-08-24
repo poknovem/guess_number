@@ -27,6 +27,8 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String? get userId => _userId;
+
   Future<void> _authenticate(
       String email, String password, String urlStr) async {
     final Uri url = Uri.parse(urlStr);
@@ -47,6 +49,7 @@ class Auth with ChangeNotifier {
       }
       _token = body['idToken'];
       _userId = body['localId'];
+      // print('_userId > ' + _userId!);
       _expiryDate = DateTime.now().add(
         Duration(
           seconds: int.parse(body['expiresIn']),

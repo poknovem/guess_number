@@ -54,4 +54,7 @@ class ThaiLanguage implements Language {
 
   @override
   String get logOut => "ล๊อคเอ๊าท์";
+
+  @override
+  String get history => "ประวัติการเล่น";
 }

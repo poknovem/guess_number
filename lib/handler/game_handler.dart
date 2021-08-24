@@ -17,9 +17,6 @@ class GameHandler {
   static final String FIREBASE_REALTIME_DATABASE_URL =
       "https://guessnumber-90e65-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-  /// scored http verb
-  static final String SCORED_HTTP_VERB = "scored.json";
-
   /// auth token http verb
   static final String SCORED_AUTH_VERB = "?auth=";
 
@@ -39,6 +36,9 @@ class GameHandler {
   static final String FIREBASE_LOG_IN_BY_EMAIL_API_URL =
       FIREBASE_AUTHENTICATION_API_URL + "signInWithPassword?key=";
 
+  static final String USER_ID_KEYWORD = "USER_ID_KEYWORD";
+  static final String AUTH_KEYWORD = "AUTH_KEYWORD";
+
   ///sign up url
   static final String SIGN_UP_URL =
       FIREBASE_SIGN_UP_BY_EMAIL_API_URL + FIREBASE_WEB_API_KEY;
@@ -47,9 +47,22 @@ class GameHandler {
   static final String LOG_IN_URL =
       FIREBASE_LOG_IN_BY_EMAIL_API_URL + FIREBASE_WEB_API_KEY;
 
-  /// scored url
-  static final String SCORED_URL =
-      FIREBASE_REALTIME_DATABASE_URL + SCORED_HTTP_VERB + SCORED_AUTH_VERB;
+  /// save scored url
+  static final String SAVE_SCORED_URL = FIREBASE_REALTIME_DATABASE_URL +
+      "scored/" +
+      '/' +
+      USER_ID_KEYWORD +
+      '.json' +
+      SCORED_AUTH_VERB +
+      AUTH_KEYWORD;
+
+  /// get scired by userId url
+  static final String GET_SCORED_URL = FIREBASE_REALTIME_DATABASE_URL +
+      "scored/" +
+      USER_ID_KEYWORD +
+      '.json' +
+      SCORED_AUTH_VERB +
+      AUTH_KEYWORD;
 
   /// error message mapping
   static final Map<String, String> ERROR_MESSAGE_MAPPING = {

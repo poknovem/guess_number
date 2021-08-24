@@ -17,4 +17,5 @@ abstract class Language {
   String pleaseEnterXDigit(int digit);
   String get pleaseEnterNoDuplicateDigit;
   String get logOut;
+  String get history;
 }

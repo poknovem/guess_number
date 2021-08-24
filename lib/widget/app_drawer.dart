@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screen/history_screen.dart';
 import '../providers/lang.dart';
 import '../providers/auth.dart';
 import '../screen/settings_screen.dart';
@@ -17,6 +18,14 @@ class AppDrawer extends StatelessWidget {
             title: Text('Guess Number'),
             automaticallyImplyLeading: false,
           ),
+          ListTile(
+            leading: Icon(Icons.history),
+            title: Text(lang.language.history),
+            onTap: () {
+              Navigator.of(context).pushNamed(HistoryScreen.ROUTE_NAME);
+            },
+          ),
+          Divider(),
           ListTile(
             leading: Icon(Icons.settings),
             title: Text(lang.language.settings),

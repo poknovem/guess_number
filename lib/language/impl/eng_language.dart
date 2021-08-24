@@ -54,4 +54,7 @@ class EngLanguage implements Language {
 
   @override
   String get logOut => "Log Out";
+
+  @override
+  String get history => "History";
 }

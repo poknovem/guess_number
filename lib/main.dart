@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screen/history_screen.dart';
 import '../providers/lang.dart';
 import '../screen/settings_screen.dart';
 import '../providers/auth.dart';
@@ -30,9 +31,9 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) => Lang(),
         ),
         ChangeNotifierProxyProvider<Auth, Score>(
-          create: (BuildContext context) => Score("initial token"),
+          create: (BuildContext context) => Score("initial token", "user id"),
           update: (BuildContext context, Auth auth, ChangeNotifier? previous) =>
-              Score(auth.token!),
+              Score(auth.token!, auth.userId!),
         ),
       ],
       child: Consumer<Auth>(
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
             PlayGame.ROUTE_NAME: (ctx) => PlayGame(),
             AuthScreen.ROUTE_NAME: (ctx) => AuthScreen(),
             SettingsScreen.ROUTE_NAME: (ctx) => SettingsScreen(),
+            HistoryScreen.ROUTE_NAME: (ctx) => HistoryScreen(),
           },
         ),
       ),
