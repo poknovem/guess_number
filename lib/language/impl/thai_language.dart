@@ -57,4 +57,7 @@ class ThaiLanguage implements Language {
 
   @override
   String get history => "ประวัติการเล่น";
+
+  @override
+  String get noHistory => "ไม่พบประวัติการเล่น!!";
 }

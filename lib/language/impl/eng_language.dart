@@ -57,4 +57,7 @@ class EngLanguage implements Language {
 
   @override
   String get history => "History";
+
+  @override
+  String get noHistory => "No history!!";
 }

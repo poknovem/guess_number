@@ -41,6 +41,7 @@ class Score with ChangeNotifier {
   }
 
   Future<List<ScoreItem>> getScoredByUserId() async {
+    //print('getScoredByUserId > ');
     List<ScoreItem> scoreList = [];
     final url = Uri.parse(GameHandler.GET_SCORED_URL
         .replaceAll(GameHandler.USER_ID_KEYWORD, _userId)
@@ -52,10 +53,9 @@ class Score with ChangeNotifier {
     try {
       final http.Response response = await http.get(url);
 
-      final Map<String, dynamic> body =
-          json.decode(response.body) as Map<String, dynamic>;
+      final body = json.decode(response.body);
 
-      //print(body);
+      //print('body > ' + body.toString());
       if (body['error'] != null) {
         //print("==> " + body['error']);
         throw HttpException(body['error']);
@@ -68,8 +68,12 @@ class Score with ChangeNotifier {
         scoreList.add(st);
       });
     } on Exception catch (e) {
+      //print('throw > ' + e.toString());
       throw e;
+    } finally {
+      //print('finally');
     }
+
     return scoreList;
   }
 }

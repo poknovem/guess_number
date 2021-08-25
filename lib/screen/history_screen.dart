@@ -16,27 +16,35 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   List<ScoreItem> scoreHistories = []; //local state
-  bool isFirst = true;
+  //bool isFirst = true;
 
-  @override
-  void initState() {
-    Provider.of<Score>(context, listen: false)
-        .getScoredByUserId()
-        .then((value) {
-      setState(() {
-        scoreHistories = value;
-        isFirst = false;
-      });
-    });
+  /**
+   * History information fetching is removed from initState() because it is replaced by "FutureBuilder"
+   * so don't need to have initState() for the first History information fetching from server anymore.
+   * but still StatefulWidget because HistoryScreen can refresh itself by RefreshIndicator
+   */
+  // @override
+  // void initState() {
+  //   Provider.of<Score>(context, listen: false)
+  //       .getScoredByUserId()
+  //       .then((value) {
+  //     setState(() {
+  //       scoreHistories = value;
+  //       isFirst = false;
+  //     });
+  //   });
 
-    super.initState();
-  }
+  //   super.initState();
+  // }
 
   Future<void> _refreshHistory(BuildContext context) async {
-    List<ScoreItem> value =
-        await Provider.of<Score>(context, listen: false).getScoredByUserId();
+    //print('_refreshHistory');
+
+    /**It is removed because have another fetching at future in FutureBuilder (2 time fetching) */
+    // List<ScoreItem> value =
+    //     await Provider.of<Score>(context, listen: false).getScoredByUserId();
     setState(() {
-      scoreHistories = value;
+      scoreHistories = [];
     });
   }
 
@@ -47,55 +55,91 @@ class _HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         title: Text(lang.appName),
       ),
-      body: isFirst
-          ? Center(
+      body: FutureBuilder(
+        future: Provider.of<Score>(context, listen: false).getScoredByUserId()
+          /**Must use .. because want return Future<List<ScoreItem>> otherwise it will return Future<Null>*/
+          ..then((value) {
+            //print('History information fetching done');
+            scoreHistories = value;
+          }),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            //print('waiting');
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
-              onRefresh: () => _refreshHistory(context),
-              child: Container(
-                child: ListView.builder(
-                  itemBuilder: (ctx, index) => Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(15),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat('dd/MM/yy, HH:mm')
-                                  .format(scoreHistories[index].date),
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'Raleway',
-                                fontWeight: FontWeight.normal,
-                              ),
+            );
+          } else {
+            //print('done');
+            if (snapshot.hasData) {
+              if (snapshot.error != null) {
+                //print('error > ' + snapshot.error.toString());
+                return Center(
+                  child: Text("Some thing went wrong!!"),
+                );
+              } else {
+                //print('no more error');
+                return RefreshIndicator(
+                  onRefresh: () => _refreshHistory(context),
+                  child: Container(
+                    child: ListView.builder(
+                      itemBuilder: (ctx, index) => Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(15),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  DateFormat('dd/MM/yy, HH:mm')
+                                      .format(scoreHistories[index].date),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                Text(
+                                  "    :    ",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  scoreHistories[index].timeUsage.toString(),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'Raleway',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              "    :    ",
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontFamily: 'Raleway',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              scoreHistories[index].timeUsage.toString(),
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'Raleway',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
+                      itemCount: scoreHistories.length,
                     ),
                   ),
-                  itemCount: scoreHistories.length,
-                ),
-              ),
-            ),
+                );
+              }
+            } else {
+              return RefreshIndicator(
+                onRefresh: () => _refreshHistory(context),
+                child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(20.0),
+                    children: [
+                      Center(
+                        child: new Text(lang.noHistory),
+                      ),
+                    ]),
+              );
+            }
+          }
+        },
+      ),
     );
   }
 }

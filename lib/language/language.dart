@@ -18,4 +18,5 @@ abstract class Language {
   String get pleaseEnterNoDuplicateDigit;
   String get logOut;
   String get history;
+  String get noHistory;
 }
