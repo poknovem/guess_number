@@ -15,36 +15,49 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  List<ScoreItem> scoreHistories = []; //local state
   //bool isFirst = true;
+  List<ScoreItem> scoreHistories = []; //local state
 
   /**
-   * History information fetching is removed from initState() because it is replaced by "FutureBuilder"
-   * so don't need to have initState() for the first History information fetching from server anymore.
-   * but still StatefulWidget because HistoryScreen can refresh itself by RefreshIndicator
+   * historyFuture: For when re-build in build method then do not fetching in FutureBuilder again
    */
-  // @override
-  // void initState() {
-  //   Provider.of<Score>(context, listen: false)
-  //       .getScoredByUserId()
-  //       .then((value) {
-  //     setState(() {
-  //       scoreHistories = value;
-  //       isFirst = false;
-  //     });
-  //   });
+  late Future<List<ScoreItem>> historyFuture;
 
-  //   super.initState();
-  // }
+  Future<List<ScoreItem>> obtainHistoryFuture() {
+    return Provider.of<Score>(context, listen: false).getScoredByUserId()
+      /**Must use .. because want return Future<List<ScoreItem>> otherwise it will return Future<Null>*/
+      ..then((value) {
+        //print('History information fetching done');
+        scoreHistories = value;
+      });
+  }
+
+  @override
+  void initState() {
+    historyFuture = obtainHistoryFuture();
+
+    /**
+     *  History information fetching is removed from initState() because it is replaced by "FutureBuilder" 
+     * */
+    // Provider.of<Score>(context, listen: false)
+    //     .getScoredByUserId()
+    //     .then((value) {
+    //   setState(() {
+    //     scoreHistories = value;
+    //     isFirst = false;
+    //   });
+    // });
+
+    super.initState();
+  }
 
   Future<void> _refreshHistory(BuildContext context) async {
     //print('_refreshHistory');
 
-    /**It is removed because have another fetching at future in FutureBuilder (2 time fetching) */
-    // List<ScoreItem> value =
-    //     await Provider.of<Score>(context, listen: false).getScoredByUserId();
+    List<ScoreItem> value =
+        await Provider.of<Score>(context, listen: false).getScoredByUserId();
     setState(() {
-      scoreHistories = [];
+      scoreHistories = value;
     });
   }
 
@@ -56,12 +69,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         title: Text(lang.appName),
       ),
       body: FutureBuilder(
-        future: Provider.of<Score>(context, listen: false).getScoredByUserId()
-          /**Must use .. because want return Future<List<ScoreItem>> otherwise it will return Future<Null>*/
-          ..then((value) {
-            //print('History information fetching done');
-            scoreHistories = value;
-          }),
+        future: historyFuture,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             //print('waiting');
@@ -128,13 +136,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
               return RefreshIndicator(
                 onRefresh: () => _refreshHistory(context),
                 child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(20.0),
-                    children: [
-                      Center(
-                        child: new Text(lang.noHistory),
-                      ),
-                    ]),
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(20.0),
+                  children: [
+                    Center(
+                      child: new Text(lang.noHistory),
+                    ),
+                  ],
+                ),
               );
             }
           }
