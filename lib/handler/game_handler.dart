@@ -50,7 +50,6 @@ class GameHandler {
   /// save scored url
   static final String SAVE_SCORED_URL = FIREBASE_REALTIME_DATABASE_URL +
       "scored/" +
-      '/' +
       USER_ID_KEYWORD +
       '.json' +
       SCORED_AUTH_VERB +

@@ -32,6 +32,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.initState();
   }
 
+  Future<void> _refreshHistory(BuildContext context) async {
+    List<ScoreItem> value =
+        await Provider.of<Score>(context, listen: false).getScoredByUserId();
+    setState(() {
+      scoreHistories = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Language lang = Provider.of<Lang>(context).language;
@@ -43,46 +51,49 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Container(
-              child: ListView.builder(
-                itemBuilder: (ctx, index) => Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(15),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            DateFormat('dd/MM/yy, HH:mm')
-                                .format(scoreHistories[index].date),
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'Raleway',
-                              fontWeight: FontWeight.normal,
+          : RefreshIndicator(
+              onRefresh: () => _refreshHistory(context),
+              child: Container(
+                child: ListView.builder(
+                  itemBuilder: (ctx, index) => Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              DateFormat('dd/MM/yy, HH:mm')
+                                  .format(scoreHistories[index].date),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "    :    ",
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: 'Raleway',
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              "    :    ",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            scoreHistories[index].timeUsage.toString(),
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'Raleway',
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              scoreHistories[index].timeUsage.toString(),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                  itemCount: scoreHistories.length,
                 ),
-                itemCount: scoreHistories.length,
               ),
             ),
     );
