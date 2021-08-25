@@ -78,8 +78,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
             );
           } else {
             //print('done');
-            if (snapshot.hasData) {
-              if (snapshot.error != null) {
+            if (snapshot.hasData &&
+                snapshot.data != null &&
+                scoreHistories.length > 0) {
+              if (snapshot.hasError && snapshot.error != null) {
                 //print('error > ' + snapshot.error.toString());
                 return Center(
                   child: Text("Some thing went wrong!!"),
@@ -136,7 +138,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               return RefreshIndicator(
                 onRefresh: () => _refreshHistory(context),
                 child: ListView(
-                  shrinkWrap: true,
                   padding: const EdgeInsets.all(20.0),
                   children: [
                     Center(

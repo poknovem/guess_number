@@ -56,17 +56,19 @@ class Score with ChangeNotifier {
       final body = json.decode(response.body);
 
       //print('body > ' + body.toString());
-      if (body['error'] != null) {
-        //print("==> " + body['error']);
-        throw HttpException(body['error']);
-      }
+      if (body != null) {
+        if (body['error'] != null) {
+          //print("==> " + body['error']);
+          throw HttpException(body['error']);
+        }
 
-      body.forEach((key, value) {
-        //print("==> " + value['time_usage']);
-        ScoreItem st = ScoreItem(_userId, double.parse(value['time_usage']),
-            DateTime.parse(value['date']));
-        scoreList.add(st);
-      });
+        body.forEach((key, value) {
+          //print("==> " + value['time_usage']);
+          ScoreItem st = ScoreItem(_userId, double.parse(value['time_usage']),
+              DateTime.parse(value['date']));
+          scoreList.add(st);
+        });
+      }
     } on Exception catch (e) {
       //print('throw > ' + e.toString());
       throw e;
