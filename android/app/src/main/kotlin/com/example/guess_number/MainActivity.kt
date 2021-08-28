@@ -1,4 +1,4 @@
-package com.example.guess_number
+package com.poknovem.guess_number
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.guess_number">
+    package="com.poknovem.guess_number">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="guess_number"
+        android:label="Guess Number"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
