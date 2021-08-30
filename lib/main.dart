@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screen/how_to_play_screen.dart';
 import '../screen/history_screen.dart';
 import '../providers/lang.dart';
 import '../screen/settings_screen.dart';
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
             AuthScreen.ROUTE_NAME: (ctx) => AuthScreen(),
             SettingsScreen.ROUTE_NAME: (ctx) => SettingsScreen(),
             HistoryScreen.ROUTE_NAME: (ctx) => HistoryScreen(),
+            HowToPlayScreen.ROUTE_NAME: (ctx) => HowToPlayScreen(),
           },
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screen/how_to_play_screen.dart';
 import '../screen/history_screen.dart';
 import '../providers/lang.dart';
 import '../providers/auth.dart';
@@ -18,6 +19,14 @@ class AppDrawer extends StatelessWidget {
             title: Text('Guess Number'),
             automaticallyImplyLeading: false,
           ),
+          ListTile(
+            leading: Icon(Icons.play_circle),
+            title: Text(lang.language.howToPlay),
+            onTap: () {
+              Navigator.of(context).pushNamed(HowToPlayScreen.ROUTE_NAME);
+            },
+          ),
+          Divider(),
           ListTile(
             leading: Icon(Icons.history),
             title: Text(lang.language.history),

@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import '../language.dart';
 
 class EngLanguage implements Language {
@@ -60,4 +62,60 @@ class EngLanguage implements Language {
 
   @override
   String get noHistory => "No history!!";
+
+  @override
+  String get howToPlay => "How to play";
+
+  @override
+  RichText get howToPlayDesc {
+    return RichText(
+      text: TextSpan(
+        // Note: Styles for TextSpans must be explicitly defined.
+        // Child text spans will inherit styles from parent
+        style: TextStyle(
+          color: Color.fromRGBO(20, 51, 51, 1),
+          fontSize: 20,
+          fontFamily: 'Raleway',
+        ),
+        children: <TextSpan>[
+          TextSpan(text: '     Guess'),
+          TextSpan(
+              text: ' 4 ', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(
+              text:
+                  'number. There are also Random mode, Specific mode.\n\n For Example, If The correct number is '),
+          TextSpan(
+              text: '1234', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '\n\n     - round 1 guess'),
+          TextSpan(
+              text: ' 1278 ',
+              style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: 'game will hint '),
+          TextSpan(
+              text: '2A0B', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '\n\n     - round 2 guess'),
+          TextSpan(
+              text: ' 1243 ',
+              style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: 'game will hint '),
+          TextSpan(
+              text: '2A2B', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '\n\n     - round 3 guess'),
+          TextSpan(
+              text: ' 1234 ',
+              style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: 'You win!! by '),
+          TextSpan(
+              text: '4A0B', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '\n\n** ('),
+          TextSpan(
+              text: ' A ', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '=correct number and correct position, '),
+          TextSpan(
+              text: ' B ', style: new TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '=correct number but wrong position) **'),
+        ],
+      ),
+    );
+  }
 }

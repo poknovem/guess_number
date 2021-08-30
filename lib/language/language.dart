@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 abstract class Language {
   String get appName;
   String get randomNumberOptionName;
@@ -19,4 +21,6 @@ abstract class Language {
   String get logOut;
   String get history;
   String get noHistory;
+  String get howToPlay;
+  RichText get howToPlayDesc;
 }
