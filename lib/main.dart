@@ -32,13 +32,18 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) => Lang(),
         ),
         ChangeNotifierProxyProvider<Auth, Score>(
-          create: (BuildContext context) => Score("initial token", "user id"),
-          update: (BuildContext context, Auth auth, ChangeNotifier? previous) =>
-              Score(auth.token!, auth.userId!),
-        ),
+            create: (BuildContext context) => Score("initial token", "user id"),
+            update:
+                (BuildContext context, Auth auth, ChangeNotifier? previous) {
+              if (auth.token == null || auth.userId == null) {
+                return Score("initial token", "user id");
+              } else {
+                return Score(auth.token!, auth.userId!);
+              }
+            }),
       ],
       child: Consumer<Auth>(
-        builder: (ctx, auth, _) => MaterialApp(
+        builder: (context, auth, child) => MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
             primarySwatch: Colors.pink,
@@ -65,9 +70,31 @@ class MyApp extends StatelessWidget {
                   future: auth.tryAutoLogin(),
                   builder:
                       (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                    return snapshot.connectionState == ConnectionState.waiting
-                        ? CircularProgressIndicator()
-                        : AuthScreen();
+                    //print('builder');
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      //print('waiting');
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        //print('snapshot.data > ' + snapshot.data.toString());
+                        if (snapshot.hasError && snapshot.error != null) {
+                          //print('error > ' + snapshot.error.toString());
+                          return Center(
+                            child: Text("Some thing went wrong!!"),
+                          );
+                        } else if (snapshot.data as bool) {
+                          return GameModeScreen();
+                        } else {
+                          return AuthScreen();
+                        }
+                      } else {
+                        return Center(
+                          child: Text("Some thing went wrong!!"),
+                        );
+                      }
+                    }
                   },
                 ),
           routes: {

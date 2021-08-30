@@ -85,9 +85,11 @@ class Auth with ChangeNotifier {
       _authTimer?.cancel();
       _authTimer = null;
     }
-    notifyListeners();
+
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
+
+    notifyListeners();
   }
 
   void _autoLogout() {
@@ -100,11 +102,12 @@ class Auth with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey(USERDATA_PREFS_KEY)) {
+    String? extractedUserDataTemp = prefs.getString(USERDATA_PREFS_KEY);
+
+    if (extractedUserDataTemp == null) {
       return false;
     }
 
-    String? extractedUserDataTemp = prefs.getString(USERDATA_PREFS_KEY);
     if (extractedUserDataTemp != null) {
       var extractedUserData = json.decode(extractedUserDataTemp);
       final expiryDate =

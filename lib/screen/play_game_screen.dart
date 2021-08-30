@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../providers/lang.dart';
 import '../providers/score.dart';
 import '../handler/timer_controller.dart';
 import '../widget/timer_stop_watch.dart';
 import '../handler/game_handler.dart';
-import './game_mode_screen.dart';
 import 'package:provider/provider.dart';
 
 class PlayGame extends StatefulWidget {
@@ -127,8 +125,13 @@ class _PlayGameState extends State<PlayGame> {
               //   isWin = false;
               // });
 
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  GameModeScreen.ROUTE_NAME, (route) => false);
+              //++Fix bug: When Logout then do not show Authenticate screen
+              //Navigator.of(context).pop();
+              //Navigator.of(context).pop();
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              // Navigator.of(context).pushNamedAndRemoveUntil(
+              //     GameModeScreen.ROUTE_NAME, (route) => false);
+              //--Fix bug: When Logout then do not show Authenticate screen
             },
           ),
           FlatButton(
